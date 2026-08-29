@@ -22,7 +22,7 @@ def detect_anomalies(df: pd.DataFrame, contamination: float = 0.02) -> pd.DataFr
     df = df.copy()
 
     # Select features for the model
-    features = ["daily_return", "rolling_mean", "rolling_std", "z_score"]
+    features = ["daily_return", "rolling_mean", "rolling_std", "z_score", "ols_residual"]
     X = df[features]
 
     # Train Isolation Forest
