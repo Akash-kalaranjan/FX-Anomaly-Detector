@@ -23,10 +23,10 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     df["daily_return"] = df["rate"].pct_change()
 
     # Rolling 21-day mean — average rate over the past 21 trading days
-    df["rolling_mean"] = df["daily_return"].rolling(window=21).mean()
+    df["rolling_mean"] = df["daily_return"].shift(1).rolling(window=21).mean()
 
     # Rolling 21-day std — volatility over the past 21 trading days
-    df["rolling_std"] = df["daily_return"].rolling(window=21).std()
+    df["rolling_std"] = df["daily_return"].shift(1).rolling(window=21).std()
 
     # Z-score — how unusual today's return is relative to recent behaviour
     df["z_score"] = (df["daily_return"] - df["rolling_mean"]) / df["rolling_std"]
