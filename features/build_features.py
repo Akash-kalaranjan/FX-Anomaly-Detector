@@ -39,10 +39,27 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     X = df[features]
     y = df["daily_return"]
 
-    ols = LinearRegression()
-    ols.fit(X, y)
+    expected_returns = []
 
-    df["expected_return"] = ols.predict(X)
+    min_train_size = 100
+
+    for i in range(len(df)):
+        if i < min_train_size:
+            expected_returns.append(np.nan)
+            continue
+
+        X_train = X.iloc[:i]
+        y_train = y.iloc[:i]
+
+        ols = LinearRegression()
+        ols.fit(X_train, y_train)
+
+        X_today = X.iloc[[i]]
+        expected_return = ols.predict(X_today)[0]
+
+        expected_returns.append(expected_return)
+
+    df["expected_return"] = expected_returns
 
     # OLS Residual — how far actual return deviated from expected
     df["ols_residual"] = df["daily_return"] - df["expected_return"]
@@ -53,5 +70,5 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
 if __name__ == "__main__":
     raw_df = get_fx_series("FXUSDCAD", "2017-01-01", "2024-12-31")
     featured_df = build_features(raw_df)
-    print(featured_df[["date", "daily_return", "expected_return", "ols_residual"]].head(10))
+    print(featured_df[["date", "daily_return", "expected_return", "ols_residual"]].iloc[105:125])
     print(f"\nShape: {featured_df.shape}")
